@@ -1,21 +1,214 @@
 <template>
-  <div class="min-h-screen bg-gray-100 py-8 px-4 sm:px-6">
+  <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6">
+    <!-- Botón Toggle Dashboard -->
+    <button
+      @click="toggleDashboard"
+      class="mb-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+    >
+      Ver Dashboard
+    </button>
+
+    <transition name="modal">
+      <div
+        v-if="showDashboard"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center z-50 pt-4"
+      >
+        <div
+          class="bg-white rounded-lg shadow-xl w-11/12 max-w-4xl max-h-[95vh] flex flex-col"
+        >
+          <div
+            class="sticky top-0 bg-white px-6 py-4 border-b border-gray-200 rounded-t-lg z-10"
+          >
+            <div class="flex justify-between items-center">
+              <h2 class="text-2xl font-bold text-gray-800">
+                Dashboard del Proyecto
+              </h2>
+              <button
+                @click="toggleDashboard"
+                class="text-gray-500 hover:text-gray-700 text-2xl transition duration-200"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+
+          <!-- Grid de Hoteles -->
+          <div class="overflow-y-auto p-6">
+            <div class="space-y-6">
+              <div
+                class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition duration-200"
+              >
+                <div class="flex justify-between items-center mb-4">
+                  <h3 class="text-xl font-semibold text-gray-800">Hoteles</h3>
+                  <span
+                    class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full"
+                  >
+                    {{ hotels.length }} total
+                  </span>
+                </div>
+                <div class="grid gap-4">
+                  <div
+                    v-for="hotel in hotels"
+                    :key="hotel.id"
+                    class="border-b pb-3 hover:bg-gray-50 p-4 rounded-md transition duration-200"
+                  >
+                    <div class="flex justify-between items-start mb-3">
+                      <div>
+                        <h4 class="font-medium text-blue-700 text-lg">
+                          {{ hotel.name }}
+                        </h4>
+                        <p class="text-sm text-gray-600">
+                          {{ hotel.city }} - {{ hotel.address }}
+                        </p>
+                        <p class="text-sm text-gray-500">
+                          NIT: {{ hotel.nit }}
+                        </p>
+                      </div>
+                      <span
+                        class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
+                      >
+                        {{ hotel.total_rooms }} habitaciones
+                      </span>
+                    </div>
+
+                    <div class="mt-3">
+                      <p class="text-sm font-medium text-gray-700 mb-2">
+                        Distribución de Habitaciones:
+                      </p>
+                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div
+                          v-for="room in hotel.hotel_rooms"
+                          :key="room.id"
+                          class="flex items-center p-2 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
+                        >
+                          <div class="flex-1">
+                            <div class="flex items-center">
+                              <span class="text-sm font-medium text-gray-800">
+                                {{ room.room_type?.name }}
+                              </span>
+                              <span class="mx-2 text-gray-400">•</span>
+                              <span class="text-sm text-gray-600">
+                                {{ room.accommodation?.name }}
+                              </span>
+                            </div>
+                            <div class="flex items-center mt-1">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="h-4 w-4 text-gray-400 mr-1"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                                />
+                              </svg>
+                              <span class="text-sm text-gray-500">
+                                {{ room.quantity }} unidad{{
+                                  room.quantity !== 1 ? "es" : ""
+                                }}
+                              </span>
+                            </div>
+                          </div>
+                          <div
+                            class="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-medium"
+                          >
+                            {{
+                              (
+                                (room.quantity / hotel.total_rooms) *
+                                100
+                              ).toFixed(1)
+                            }}%
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tipos de Habitación -->
+              <div
+                class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition duration-200"
+              >
+                <div class="flex justify-between items-center mb-4">
+                  <h3 class="text-xl font-semibold text-gray-800">
+                    Tipos de Habitación
+                  </h3>
+                  <span
+                    class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full"
+                  >
+                    {{ roomTypes.length }} tipos
+                  </span>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  <div
+                    v-for="type in roomTypes"
+                    :key="type.id"
+                    class="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100200"
+                  >
+                    <span class="text-gray-700 font-medium">{{
+                      type.name
+                    }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Acomodaciones -->
+              <div
+                class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition duration-200"
+              >
+                <div class="flex justify-between items-center mb-4">
+                  <h3 class="text-xl font-semibold text-gray-800">
+                    Acomodaciones
+                  </h3>
+                  <span
+                    class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full"
+                  >
+                    {{ accommodations.length }} tipos
+                  </span>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  <div
+                    v-for="acc in accommodations"
+                    :key="acc.id"
+                    class="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition duration-200"
+                  >
+                    <span class="text-gray-700 font-medium">{{
+                      acc.name
+                    }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Formulario Principal -->
     <div class="max-w-3xl mx-auto">
       <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
-        Hoteles
+        Registro de Hotel
       </h2>
 
-      <form @submit.prevent="saveHotel" class="bg-white shadow-md rounded-lg p-6 sm:p-8">
+      <form
+        @submit.prevent="saveHotel"
+        class="bg-white shadow-lg rounded-lg p-6 sm:p-8 border border-gray-200"
+      >
         <!-- Información Básica -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           <div v-for="field in basicFields" :key="field.name">
-            <label class="block text-sm font-medium text-gray-600 mb-1">
+            <label class="block text-sm font-medium text-gray-700 mb-1">
               {{ field.label }}
             </label>
-            <input 
-              v-model="hotel[field.name]" 
+            <input
+              v-model="hotel[field.name]"
               :type="field.type || 'text'"
-              class="w-full border rounded-md px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
               :placeholder="field.placeholder"
               required
             />
@@ -23,94 +216,95 @@
         </div>
 
         <!-- Configuración de Habitaciones -->
-        <div class="bg-gray-50 rounded-md p-4 sm:p-6 mb-6 border border-gray-200">
+        <div class="bg-gray-50 rounded-lg p-6 mb-6 border border-gray-200">
           <div class="flex justify-between items-center mb-4">
-            <h3 class="text-base font-semibold text-gray-700">
+            <h3 class="text-lg font-semibold text-gray-800">
               Configuración de Habitaciones
             </h3>
-            <button 
-              type="button" 
+            <button
+              type="button"
               @click="addRoom"
-              class="flex items-center px-3 py-1.5 rounded-md bg-blue-500 text-white text-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+              class="px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200"
             >
-              + Habitación
+              + Añadir Habitación
             </button>
           </div>
 
-          <transition-group 
-            name="fade" 
-            tag="div" 
-            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-          >
-            <div 
-              v-for="(room, index) in hotel.rooms" 
-              :key="index" 
-              class="bg-white border rounded-md p-4 shadow-sm relative transition"
+          <div class="grid gap-4">
+            <div
+              v-for="(room, index) in hotel.rooms"
+              :key="index"
+              class="bg-white p-4 rounded-lg border border-gray-200 relative"
             >
-              <button 
-                type="button" 
-                @click="removeRoom(index)" 
-                class="absolute top-2 right-2 text-red-500 hover:text-red-600 transition"
+              <button
+                type="button"
+                @click="removeRoom(index)"
+                class="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition duration-200"
               >
                 ×
               </button>
-              <div>
-                <label class="block text-sm font-medium text-gray-600 mb-1">
-                  Tipo de Habitación
-                </label>
-                <select 
-                  v-model="room.room_type_id" 
-                  class="w-full border rounded-md px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                  required
-                >
-                  <option value="">Seleccionar</option>
-                  <option 
-                    v-for="type in roomTypes" 
-                    :key="type.id" 
-                    :value="type.id"
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Tipo de Habitación
+                  </label>
+                  <select
+                    v-model="room.room_type_id"
+                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                    required
                   >
-                    {{ type.name }}
-                  </option>
-                </select>
-              </div>
-              <div class="mt-3">
-                <label class="block text-sm font-medium text-gray-600 mb-1">
-                  Acomodación
-                </label>
-                <select 
-                  v-model="room.accommodation_id" 
-                  class="w-full border rounded-md px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                  required
-                >
-                  <option value="">Seleccionar</option>
-                  <option 
-                    v-for="acc in validAccommodations(room.room_type_id)" 
-                    :key="acc.id" 
-                    :value="acc.id"
+                    <option value="">Seleccionar tipo</option>
+                    <option
+                      v-for="type in roomTypes"
+                      :key="type.id"
+                      :value="type.id"
+                    >
+                      {{ type.name }}
+                    </option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Acomodación
+                  </label>
+                  <select
+                    v-model="room.accommodation_id"
+                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                    required
                   >
-                    {{ acc.name }}
-                  </option>
-                </select>
-              </div>
-              <div class="mt-3">
-                <label class="block text-sm font-medium text-gray-600 mb-1">
-                  Cantidad
-                </label>
-                <input 
-                  v-model="room.quantity" 
-                  type="number"
-                  class="w-full border rounded-md px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                  required
-                />
+                    <option value="">Seleccionar acomodación</option>
+                    <option
+                      v-for="acc in validAccommodations(room.room_type_id)"
+                      :key="acc.id"
+                      :value="acc.id"
+                    >
+                      {{ acc.name }}
+                    </option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Cantidad
+                  </label>
+                  <input
+                    v-model="room.quantity"
+                    type="number"
+                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                    required
+                  />
+                </div>
               </div>
             </div>
-          </transition-group>
+          </div>
         </div>
 
         <div class="flex justify-end">
-          <button 
-            type="submit" 
-            class="px-5 py-2 rounded-md bg-green-500 text-white text-sm font-medium hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 transition"
+          <button
+            type="submit"
+            class="px-5 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200"
           >
             Guardar Hotel
           </button>
@@ -121,12 +315,12 @@
 </template>
 
 <script>
-
- import api from '@/config/axios'
+import api from "@/config/axios";
 
 export default {
   data() {
     return {
+      showDashboard: false,
       hotel: {
         name: "",
         address: "",
@@ -135,127 +329,157 @@ export default {
         total_rooms: "",
         rooms: [],
       },
+      hotels: [],
       roomTypes: [],
       accommodations: [],
       basicFields: [
-        { name: "name", label: "Nombre del Hotel", placeholder: "Ingrese el nombre" },
-        { name: "address", label: "Dirección", placeholder: "Ingrese la dirección" },
+        {
+          name: "name",
+          label: "Nombre del Hotel",
+          placeholder: "Ingrese el nombre",
+        },
+        {
+          name: "address",
+          label: "Dirección",
+          placeholder: "Ingrese la dirección",
+        },
         { name: "city", label: "Ciudad", placeholder: "Ingrese la ciudad" },
         { name: "nit", label: "NIT", placeholder: "Ingrese el NIT" },
-        { name: "total_rooms", label: "Número de Habitaciones", type: "number", placeholder: "Total habitaciones" },
+        {
+          name: "total_rooms",
+          label: "Número de Habitaciones",
+          type: "number",
+          placeholder: "Total habitaciones",
+        },
       ],
     };
   },
   methods: {
-      async fetchHotels() {
-        const response = await api.get('/hotels')
-        this.hotels = response.data
-      },
-      async fetchRoomTypes() {
-        const response = await api.get('/room-types')
-        this.roomTypes = response.data
-      },
-      async fetchAccommodations() {
-        const response = await api.get('/accommodations')
-        this.accommodations = response.data
-      },
-      addRoom() {
-        this.hotel.rooms.push({
-          room_type_id: '',
-          accommodation_id: '',
-          quantity: ''
-        })
-      },
-      removeRoom(index) {
-        this.hotel.rooms.splice(index, 1)
-      },
-      validAccommodations(roomTypeId) {
-        if (!roomTypeId) return this.accommodations;
-        
-        // Validaciones según tipo de habitación
-        switch (roomTypeId) {
-          case 1: // ESTANDAR
-            return this.accommodations.filter(acc => 
-              [1, 2].includes(acc.id) // Solo SENCILLA o DOBLE
-            );
-          case 2: // JUNIOR
-            return this.accommodations.filter(acc => 
-              [3, 4].includes(acc.id) // Solo TRIPLE o CUÁDRUPLE
-            );
-          case 3: // SUITE
-            return this.accommodations.filter(acc => 
-              [1, 2, 3].includes(acc.id) // Solo SENCILLA, DOBLE o TRIPLE
-            );
-          default:
-            return this.accommodations;
-        }
-      },
-      async saveHotel() {
-        try {
-          // Validar que la suma total de habitaciones coincida
-          const totalRoomsSum = this.hotel.rooms.reduce((sum, room) => 
-            sum + parseInt(room.quantity), 0
+    toggleDashboard() {
+      this.showDashboard = !this.showDashboard;
+    },
+    async fetchHotels() {
+      const response = await api.get("/hotels");
+      this.hotels = response.data;
+    },
+    async fetchRoomTypes() {
+      const response = await api.get("/room-types");
+      this.roomTypes = response.data;
+    },
+    async fetchAccommodations() {
+      const response = await api.get("/accommodations");
+      this.accommodations = response.data;
+    },
+    addRoom() {
+      this.hotel.rooms.push({
+        room_type_id: "",
+        accommodation_id: "",
+        quantity: "",
+      });
+    },
+    removeRoom(index) {
+      this.hotel.rooms.splice(index, 1);
+    },
+    validAccommodations(roomTypeId) {
+      if (!roomTypeId) return this.accommodations;
+
+      switch (roomTypeId) {
+        case 1: // ESTANDAR
+          return this.accommodations.filter(
+            (acc) => [1, 2].includes(acc.id) // Solo SENCILLA o DOBLE
           );
-          
-          if (totalRoomsSum !== parseInt(this.hotel.total_rooms)) {
-            alert('La suma de habitaciones no coincide con el total especificado');
+        case 2: // JUNIOR
+          return this.accommodations.filter(
+            (acc) => [3, 4].includes(acc.id) // Solo TRIPLE o CUÁDRUPLE
+          );
+        case 3: // SUITE
+          return this.accommodations.filter(
+            (acc) => [1, 2, 3].includes(acc.id) // Solo SENCILLA, DOBLE o TRIPLE
+          );
+        default:
+          return this.accommodations;
+      }
+    },
+    async saveHotel() {
+      try {
+        const totalRoomsSum = this.hotel.rooms.reduce(
+          (sum, room) => sum + parseInt(room.quantity),
+          0
+        );
+
+        if (totalRoomsSum !== parseInt(this.hotel.total_rooms)) {
+          alert(
+            "La suma de habitaciones no coincide con el total especificado"
+          );
+          return;
+        }
+
+        const combinations = new Set();
+        for (const room of this.hotel.rooms) {
+          const combo = `${room.room_type_id}-${room.accommodation_id}`;
+          if (combinations.has(combo)) {
+            alert(
+              "No se permiten combinaciones duplicadas de tipo y acomodación"
+            );
             return;
           }
-  
-          // Verificar combinaciones únicas de tipo-acomodación
-          const combinations = new Set();
-          for (const room of this.hotel.rooms) {
-            const combo = `${room.room_type_id}-${room.accommodation_id}`;
-            if (combinations.has(combo)) {
-              alert('No se permiten combinaciones duplicadas de tipo y acomodación');
-              return;
-            }
-            combinations.add(combo);
-          }
-  
-          await api.post('/hotels', this.hotel);
-          await this.fetchHotels();
-          this.resetForm();
-        } catch (error) {
-          console.error(error);
-          if (error.response?.data?.message) {
-            alert(error.response.data.message);
-          } else {
-            alert('Error al guardar el hotel');
-          }
+          combinations.add(combo);
         }
-      },
-      resetForm() {
-        this.hotel = {
-          name: '',
-          address: '',
-          city: '',
-          nit: '',
-          total_rooms: '',
-          rooms: []
+
+        await api.post("/hotels", this.hotel);
+        await this.fetchHotels();
+        this.resetForm();
+      } catch (error) {
+        console.error(error);
+        if (error.response?.data?.message) {
+          alert(error.response.data.message);
+        } else {
+          alert("Error al guardar el hotel");
         }
       }
     },
-    async mounted() {
-      await Promise.all([
-        this.fetchHotels(),
-        this.fetchRoomTypes(),
-        this.fetchAccommodations()
-      ])
-    }
-  }
-  </script>
-  
-  <style>
-  .fade-enter-active, .fade-leave-active {
-    transition: all 0.3s ease;
-  }
-  .fade-enter-from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  .fade-leave-to {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  </style>
+    resetForm() {
+      this.hotel = {
+        name: "",
+        address: "",
+        city: "",
+        nit: "",
+        total_rooms: "",
+        rooms: [],
+      };
+    },
+  },
+  async mounted() {
+    await Promise.all([
+      this.fetchHotels(),
+      this.fetchRoomTypes(),
+      this.fetchAccommodations(),
+    ]);
+  },
+};
+</script>
+
+<style>
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.3s ease;
+}
+.fade-enter-from {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+</style>
