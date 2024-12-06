@@ -1,47 +1,54 @@
 <template>
   <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6">
-
-    
-
-      <transition
-  enter-active-class="transform ease-out duration-300 transition"
-  enter-from-class="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
-  enter-to-class="translate-y-0 opacity-100 sm:translate-x-0"
-  leave-active-class="transition ease-in duration-200"
-  leave-from-class="opacity-100"
-  leave-to-class="opacity-0"
->
-        <div 
-    v-if="notification.show"
-    :class="{
-      'fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50': true,
-      'bg-green-100 text-green-800': notification.type === 'success',
-      'bg-red-100 text-red-800': notification.type === 'error',
-      'bg-yellow-100 text-yellow-800': notification.type === 'warning'
-    }"
-  >
-  <div class="flex items-center">
-    <svg 
-      v-if="notification.type === 'success'"
-      class="w-5 h-5 mr-2" 
-      fill="currentColor" 
-      viewBox="0 0 20 20"
+    <transition
+      enter-active-class="transform ease-out duration-300 transition"
+      enter-from-class="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
+      enter-to-class="translate-y-0 opacity-100 sm:translate-x-0"
+      leave-active-class="transition ease-in duration-200"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
     >
-      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-    </svg>
-    <svg 
-      v-if="notification.type === 'error'"
-      class="w-5 h-5 mr-2" 
-      fill="currentColor" 
-      viewBox="0 0 20 20"
-    >
-      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-    </svg>
-    <span class="font-medium">{{ notification.message }}</span>
-  </div>
-</div>
-      </transition>
-   
+      <div
+        v-if="notification.show"
+        :class="{
+          'fixed top-4 right-4 p-4 rounded-lg shadow-xl z-[60]': true,
+          'bg-green-100 text-green-800 bg-opacity-100':
+            notification.type === 'success',
+          'bg-red-100 text-red-800 bg-opacity-100':
+            notification.type === 'error',
+          'bg-yellow-100 text-yellow-800 bg-opacity-100':
+            notification.type === 'warning',
+        }"
+      >
+        <div class="flex items-center">
+          <svg
+            v-if="notification.type === 'success'"
+            class="w-5 h-5 mr-2"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <svg
+            v-if="notification.type === 'error'"
+            class="w-5 h-5 mr-2"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <span class="font-medium">{{ notification.message }}</span>
+        </div>
+      </div>
+    </transition>
 
     <!-- Botón Toggle Dashboard -->
     <button
@@ -78,6 +85,61 @@
           <!-- Grid de Hoteles -->
           <div class="overflow-y-auto p-6">
             <div class="space-y-6">
+
+               <!-- Tipos de Habitación -->
+               <div
+                class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition duration-200"
+              >
+                <div class="flex justify-between items-center mb-4">
+                  <h3 class="text-xl font-semibold text-gray-800">
+                    Tipos de Habitación
+                  </h3>
+                  <span
+                    class="bg-blue-100 text-blue-800 text-sm font-medium px-2 py-1 rounded-full"
+                  >
+                    {{ roomTypes.length }} tipos
+                  </span>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  <div
+                    v-for="type in roomTypes"
+                    :key="type.id"
+                    class="flex items-center p-2 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100200"
+                  >
+                    <span class="text-gray-700 font-medium">{{
+                      type.name
+                    }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Acomodaciones -->
+              <div
+                class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition duration-200"
+              >
+                <div class="flex justify-between items-center mb-4">
+                  <h3 class="text-xl font-semibold text-gray-800">
+                    Acomodaciones
+                  </h3>
+                  <span
+                    class="bg-blue-100 text-blue-800 text-sm font-medium px-2 py-1 rounded-full"
+                  >
+                    {{ accommodations.length }} tipos
+                  </span>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  <div
+                    v-for="acc in accommodations"
+                    :key="acc.id"
+                    class="flex items-center p-2 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition duration-200"
+                  >
+                    <span class="text-gray-700 font-medium">{{
+                      acc.name
+                    }}</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Hoteles -->
               <div
                 class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition duration-200"
               >
@@ -107,11 +169,32 @@
                           NIT: {{ hotel.nit }}
                         </p>
                       </div>
-                      <span
-                        class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
-                      >
-                        {{ hotel.total_rooms }} habitaciones
-                      </span>
+                      <div class="flex items-center gap-2">
+                        <span
+                          class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
+                        >
+                          {{ hotel.total_rooms }} habitaciones
+                        </span>
+                        <button
+                          @click="deleteHotel(hotel.id)"
+                          class="bg-red-100 hover:bg-red-200 text-red-600 p-2 rounded-full transition-colors"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
 
                     <div class="mt-3">
@@ -146,7 +229,7 @@
                                   stroke-linecap="round"
                                   stroke-linejoin="round"
                                   stroke-width="2"
-                                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
                                 />
                               </svg>
                               <span class="text-sm text-gray-500">
@@ -173,59 +256,7 @@
                 </div>
               </div>
 
-              <!-- Tipos de Habitación -->
-              <div
-                class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition duration-200"
-              >
-                <div class="flex justify-between items-center mb-4">
-                  <h3 class="text-xl font-semibold text-gray-800">
-                    Tipos de Habitación
-                  </h3>
-                  <span
-                    class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full"
-                  >
-                    {{ roomTypes.length }} tipos
-                  </span>
-                </div>
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  <div
-                    v-for="type in roomTypes"
-                    :key="type.id"
-                    class="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100200"
-                  >
-                    <span class="text-gray-700 font-medium">{{
-                      type.name
-                    }}</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Acomodaciones -->
-              <div
-                class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition duration-200"
-              >
-                <div class="flex justify-between items-center mb-4">
-                  <h3 class="text-xl font-semibold text-gray-800">
-                    Acomodaciones
-                  </h3>
-                  <span
-                    class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full"
-                  >
-                    {{ accommodations.length }} tipos
-                  </span>
-                </div>
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  <div
-                    v-for="acc in accommodations"
-                    :key="acc.id"
-                    class="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition duration-200"
-                  >
-                    <span class="text-gray-700 font-medium">{{
-                      acc.name
-                    }}</span>
-                  </div>
-                </div>
-              </div>
+             
             </div>
           </div>
         </div>
@@ -377,8 +408,8 @@ export default {
       accommodations: [],
       notification: {
         show: false,
-        message: '',
-        type: 'success' // success, error, warning
+        message: "",
+        type: "success", // success, error, warning
       },
       basicFields: [
         {
@@ -448,56 +479,77 @@ export default {
           return this.accommodations;
       }
     },
-    showNotification(message, type = 'success') {
+    showNotification(message, type = "success") {
       this.notification = {
         show: true,
         message,
-        type
+        type,
       };
       setTimeout(() => {
         this.notification.show = false;
       }, 3000);
     },
     async saveHotel() {
-  try {
-    // Validar formato del NIT (debe ser #########-#)
-    const nitRegex = /^\d{9}-\d$/;
-    if (!nitRegex.test(this.hotel.nit)) {
-      this.showNotification('El NIT debe tener el formato: #########-# (9 números, guión, 1 número)', 'error');
-      return;
-    }
+      try {
+        // Validar formato del NIT (debe ser #########-#)
+        const nitRegex = /^\d{9}-\d$/;
+        if (!nitRegex.test(this.hotel.nit)) {
+          this.showNotification(
+            "El NIT debe tener el formato: #########-# (9 números, guión, 1 número)",
+            "error"
+          );
+          return;
+        }
 
-    const totalRoomsSum = this.hotel.rooms.reduce(
-      (sum, room) => sum + parseInt(room.quantity),
-      0
-    );
+        const totalRoomsSum = this.hotel.rooms.reduce(
+          (sum, room) => sum + parseInt(room.quantity),
+          0
+        );
 
-    if (totalRoomsSum !== parseInt(this.hotel.total_rooms)) {
-      this.showNotification('La suma de habitaciones no coincide con el total especificado', 'error');
-      return;
-    }
+        if (totalRoomsSum !== parseInt(this.hotel.total_rooms)) {
+          this.showNotification(
+            "La suma de habitaciones no coincide con el total especificado",
+            "error"
+          );
+          return;
+        }
 
-    const combinations = new Set();
-    for (const room of this.hotel.rooms) {
-      const combo = `${room.room_type_id}-${room.accommodation_id}`;
-      if (combinations.has(combo)) {
-        this.showNotification('No se permiten combinaciones duplicadas de tipo y acomodación', 'error');
-        return;
+        const combinations = new Set();
+        for (const room of this.hotel.rooms) {
+          const combo = `${room.room_type_id}-${room.accommodation_id}`;
+          if (combinations.has(combo)) {
+            this.showNotification(
+              "No se permiten combinaciones duplicadas de tipo y acomodación",
+              "error"
+            );
+            return;
+          }
+          combinations.add(combo);
+        }
+
+        await api.post("/hotels", this.hotel);
+        this.showNotification("Hotel creado exitosamente", "success");
+        await this.fetchHotels();
+        this.resetForm();
+      } catch (error) {
+        console.error(error);
+        const message =
+          error.response?.data?.message || "Error al guardar el hotel";
+        this.showNotification(message, "error");
       }
-      combinations.add(combo);
-    }
-
-    await api.post("/hotels", this.hotel);
-    this.showNotification('Hotel creado exitosamente', 'success');
-    await this.fetchHotels();
-    this.resetForm();
-  } catch (error) {
-    console.error(error);
-    const message = error.response?.data?.message || 'Error al guardar el hotel';
-    this.showNotification(message, 'error');
-  }
-}
-,
+    },
+    async deleteHotel(hotelId) {
+      try {
+        await api.delete(`/hotels/${hotelId}`);
+        this.showNotification("Hotel eliminado exitosamente", "success");
+        await this.fetchHotels();
+      } catch (error) {
+        console.error(error);
+        const message =
+          error.response?.data?.message || "Error al eliminar el hotel";
+        this.showNotification(message, "error");
+      }
+    },
     resetForm() {
       this.hotel = {
         name: "",
