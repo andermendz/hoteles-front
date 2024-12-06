@@ -459,37 +459,45 @@ export default {
       }, 3000);
     },
     async saveHotel() {
-      try {
-        const totalRoomsSum = this.hotel.rooms.reduce(
-          (sum, room) => sum + parseInt(room.quantity),
-          0
-        );
+  try {
+    // Validar formato del NIT (debe ser #########-#)
+    const nitRegex = /^\d{9}-\d$/;
+    if (!nitRegex.test(this.hotel.nit)) {
+      this.showNotification('El NIT debe tener el formato: #########-# (9 números, guión, 1 número)', 'error');
+      return;
+    }
 
-        if (totalRoomsSum !== parseInt(this.hotel.total_rooms)) {
-          this.showNotification('La suma de habitaciones no coincide con el total especificado', 'error');
-          return;
-        }
+    const totalRoomsSum = this.hotel.rooms.reduce(
+      (sum, room) => sum + parseInt(room.quantity),
+      0
+    );
 
-        const combinations = new Set();
-        for (const room of this.hotel.rooms) {
-          const combo = `${room.room_type_id}-${room.accommodation_id}`;
-          if (combinations.has(combo)) {
-            this.showNotification('No se permiten combinaciones duplicadas de tipo y acomodación', 'error');
-            return;
-          }
-          combinations.add(combo);
-        }
+    if (totalRoomsSum !== parseInt(this.hotel.total_rooms)) {
+      this.showNotification('La suma de habitaciones no coincide con el total especificado', 'error');
+      return;
+    }
 
-        await api.post("/hotels", this.hotel);
-        this.showNotification('Hotel creado exitosamente', 'success');
-        await this.fetchHotels();
-        this.resetForm();
-      } catch (error) {
-        console.error(error);
-        const message = error.response?.data?.message || 'Error al guardar el hotel';
-        this.showNotification(message, 'error');
+    const combinations = new Set();
+    for (const room of this.hotel.rooms) {
+      const combo = `${room.room_type_id}-${room.accommodation_id}`;
+      if (combinations.has(combo)) {
+        this.showNotification('No se permiten combinaciones duplicadas de tipo y acomodación', 'error');
+        return;
       }
-    },
+      combinations.add(combo);
+    }
+
+    await api.post("/hotels", this.hotel);
+    this.showNotification('Hotel creado exitosamente', 'success');
+    await this.fetchHotels();
+    this.resetForm();
+  } catch (error) {
+    console.error(error);
+    const message = error.response?.data?.message || 'Error al guardar el hotel';
+    this.showNotification(message, 'error');
+  }
+}
+,
     resetForm() {
       this.hotel = {
         name: "",
