@@ -1,5 +1,48 @@
 <template>
   <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6">
+
+    
+
+      <transition
+  enter-active-class="transform ease-out duration-300 transition"
+  enter-from-class="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
+  enter-to-class="translate-y-0 opacity-100 sm:translate-x-0"
+  leave-active-class="transition ease-in duration-200"
+  leave-from-class="opacity-100"
+  leave-to-class="opacity-0"
+>
+        <div 
+    v-if="notification.show"
+    :class="{
+      'fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50': true,
+      'bg-green-100 text-green-800': notification.type === 'success',
+      'bg-red-100 text-red-800': notification.type === 'error',
+      'bg-yellow-100 text-yellow-800': notification.type === 'warning'
+    }"
+  >
+  <div class="flex items-center">
+    <svg 
+      v-if="notification.type === 'success'"
+      class="w-5 h-5 mr-2" 
+      fill="currentColor" 
+      viewBox="0 0 20 20"
+    >
+      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+    </svg>
+    <svg 
+      v-if="notification.type === 'error'"
+      class="w-5 h-5 mr-2" 
+      fill="currentColor" 
+      viewBox="0 0 20 20"
+    >
+      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+    </svg>
+    <span class="font-medium">{{ notification.message }}</span>
+  </div>
+</div>
+      </transition>
+   
+
     <!-- Botón Toggle Dashboard -->
     <button
       @click="toggleDashboard"
@@ -332,6 +375,11 @@ export default {
       hotels: [],
       roomTypes: [],
       accommodations: [],
+      notification: {
+        show: false,
+        message: '',
+        type: 'success' // success, error, warning
+      },
       basicFields: [
         {
           name: "name",
@@ -400,6 +448,16 @@ export default {
           return this.accommodations;
       }
     },
+    showNotification(message, type = 'success') {
+      this.notification = {
+        show: true,
+        message,
+        type
+      };
+      setTimeout(() => {
+        this.notification.show = false;
+      }, 3000);
+    },
     async saveHotel() {
       try {
         const totalRoomsSum = this.hotel.rooms.reduce(
@@ -408,9 +466,7 @@ export default {
         );
 
         if (totalRoomsSum !== parseInt(this.hotel.total_rooms)) {
-          alert(
-            "La suma de habitaciones no coincide con el total especificado"
-          );
+          this.showNotification('La suma de habitaciones no coincide con el total especificado', 'error');
           return;
         }
 
@@ -418,24 +474,20 @@ export default {
         for (const room of this.hotel.rooms) {
           const combo = `${room.room_type_id}-${room.accommodation_id}`;
           if (combinations.has(combo)) {
-            alert(
-              "No se permiten combinaciones duplicadas de tipo y acomodación"
-            );
+            this.showNotification('No se permiten combinaciones duplicadas de tipo y acomodación', 'error');
             return;
           }
           combinations.add(combo);
         }
 
         await api.post("/hotels", this.hotel);
+        this.showNotification('Hotel creado exitosamente', 'success');
         await this.fetchHotels();
         this.resetForm();
       } catch (error) {
         console.error(error);
-        if (error.response?.data?.message) {
-          alert(error.response.data.message);
-        } else {
-          alert("Error al guardar el hotel");
-        }
+        const message = error.response?.data?.message || 'Error al guardar el hotel';
+        this.showNotification(message, 'error');
       }
     },
     resetForm() {
